@@ -34,9 +34,12 @@ func Discover() Inventory {
 func discover(q queryer) Inventory {
 	system, installedPhysicalBytes := collectSystem(q)
 	return Inventory{
-		System:     system,
-		Memory:     collectMemory(q, installedPhysicalBytes),
-		Processors: collectProcessors(q),
+		System:          system,
+		Memory:          collectMemory(q, installedPhysicalBytes),
+		Processors:      collectProcessors(q),
+		Disks:           collectDisks(q),
+		NetworkAdapters: collectNetworkAdapters(q),
+		GPUs:            collectGPUs(q),
 	}
 }
 
