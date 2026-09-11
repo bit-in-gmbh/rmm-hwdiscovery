@@ -2,7 +2,7 @@
 
 ## Summary
 
-Build `github.com/bit-in-gmbh/rmm-hwdiscovery` as package `hwdiscovery`: a dependency-light, best-effort hardware inventory library with a platform-neutral API and stable JSON representation.
+Build `github.com/bit-in-gmbh/bigrmm-hwdiscovery` as package `hwdiscovery`: a dependency-light, best-effort hardware inventory library with a platform-neutral API and stable JSON representation.
 
 Windows 10/11 and Windows Server 2016+ on amd64/arm64 are supported initially. Linux and macOS compile successfully but return an empty inventory until later collectors are implemented. The module never starts external processes and collects no monitoring metrics.
 
