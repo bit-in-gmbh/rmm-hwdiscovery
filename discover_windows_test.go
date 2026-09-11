@@ -81,8 +81,8 @@ func completeFixture() map[string]any {
 			ReleaseDate:       &releaseDate,
 		}},
 		"Win32_Processor": []win32Processor{
-			{DeviceID: pointer("CPU1"), Manufacturer: pointer("Chip Co"), Name: pointer("FastChip"), Architecture: pointer(uint16(9)), SocketDesignation: pointer("Socket B"), NumberOfCores: pointer(uint32(8)), NumberOfLogicalProcessors: pointer(uint32(16)), MaxClockSpeed: pointer(uint32(4200))},
-			{DeviceID: pointer("CPU0"), Manufacturer: pointer("Chip Co"), Name: pointer("FastChip"), Architecture: pointer(uint16(9)), SocketDesignation: pointer("Socket A"), NumberOfCores: pointer(uint32(8)), NumberOfLogicalProcessors: pointer(uint32(16)), MaxClockSpeed: pointer(uint32(4200))},
+			{DeviceID: pointer("CPU1"), Manufacturer: pointer("Chip Co"), Name: pointer("FastChip"), SerialNumber: pointer("PROCESSOR-B"), Architecture: pointer(uint16(9)), SocketDesignation: pointer("Socket B"), NumberOfCores: pointer(uint32(8)), NumberOfLogicalProcessors: pointer(uint32(16)), MaxClockSpeed: pointer(uint32(4200))},
+			{DeviceID: pointer("CPU0"), Manufacturer: pointer("Chip Co"), Name: pointer("FastChip"), SerialNumber: pointer("PROCESSOR-A"), Architecture: pointer(uint16(9)), SocketDesignation: pointer("Socket A"), NumberOfCores: pointer(uint32(8)), NumberOfLogicalProcessors: pointer(uint32(16)), MaxClockSpeed: pointer(uint32(4200))},
 		},
 		"Win32_PhysicalMemory": []win32PhysicalMemory{
 			{BankLabel: pointer("BANK 1"), DeviceLocator: pointer("DIMM_B"), Manufacturer: pointer("Memory Co"), PartNumber: pointer("PART-B"), SerialNumber: pointer("MEM-B"), Capacity: pointer(uint64(16 << 30)), ConfiguredClockSpeed: pointer(uint32(5200)), Speed: pointer(uint32(5600)), SMBIOSMemoryType: pointer(uint32(34)), FormFactor: pointer(uint16(12))},
@@ -161,13 +161,13 @@ func TestCompleteInventoryMappingAndDeterministicOrder(t *testing.T) {
 	if first.System.Chassis == nil || first.System.Chassis.Type != "laptop" || first.System.Firmware == nil || first.System.Firmware.ReleaseDate != "2026-04-03" {
 		t.Fatalf("unexpected platform component mapping: %#v", first.System)
 	}
-	if len(first.Processors) != 2 || first.Processors[0].ID != "CPU0" || first.Processors[0].Architecture != "x86_64" || first.Processors[0].MaxClockMHz != 4200 {
+	if len(first.Processors) != 2 || first.Processors[0].ID != "CPU0" || first.Processors[0].SerialNumber != "PROCESSOR-A" || first.Processors[0].Architecture != "x86_64" || first.Processors[0].MaxClockMHz != 4200 {
 		t.Fatalf("unexpected processor mapping: %#v", first.Processors)
 	}
-	if first.Memory == nil || first.Memory.InstalledPhysicalBytes != 32<<30 || len(first.Memory.Modules) != 2 || first.Memory.Modules[0].Location != "DIMM_A" || first.Memory.Modules[0].MemoryType != "ddr4" || first.Memory.Modules[1].ConfiguredSpeedMTs != 5200 {
+	if first.Memory == nil || first.Memory.InstalledPhysicalBytes != 32<<30 || len(first.Memory.Modules) != 2 || first.Memory.Modules[0].Location != "DIMM_A" || first.Memory.Modules[0].SerialNumber != "MEM-A" || first.Memory.Modules[0].MemoryType != "ddr4" || first.Memory.Modules[1].ConfiguredSpeedMTs != 5200 {
 		t.Fatalf("unexpected memory mapping: %#v", first.Memory)
 	}
-	if len(first.Disks) != 2 || *first.Disks[0].Index != 0 || first.Disks[0].MediaType != "ssd" || first.Disks[0].BusType != "nvme" || first.Disks[0].PartitionTableType != "gpt" || first.Disks[0].PhysicalSectorSizeBytes != 4096 {
+	if len(first.Disks) != 2 || *first.Disks[0].Index != 0 || first.Disks[0].SerialNumber != "DISK-A" || first.Disks[0].MediaType != "ssd" || first.Disks[0].BusType != "nvme" || first.Disks[0].PartitionTableType != "gpt" || first.Disks[0].PhysicalSectorSizeBytes != 4096 {
 		t.Fatalf("unexpected disk mapping: %#v", first.Disks)
 	}
 	if len(first.Disks[0].Partitions) != 2 || *first.Disks[0].Partitions[0].Index != 0 || len(first.Disks[0].Partitions[0].Volumes) != 1 || first.Disks[0].Partitions[0].Volumes[0].MountPoints[0] != `C:\` {

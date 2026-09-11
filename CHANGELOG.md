@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## Unreleased
+
+- Added best-effort processor serial-number discovery on supported Windows systems and expanded serial-number contract coverage for memory modules and physical disks.
+
 ## 1.0.0 - 2026-09-11
 
 - Added the stable, platform-neutral hardware inventory API and JSON contract.

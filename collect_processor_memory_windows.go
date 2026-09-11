@@ -9,6 +9,7 @@ type win32Processor struct {
 	ProcessorId               *string
 	Manufacturer              *string
 	Name                      *string
+	SerialNumber              *string
 	Architecture              *uint16
 	SocketDesignation         *string
 	NumberOfCores             *uint32
@@ -42,6 +43,7 @@ func collectProcessors(q queryer) []Processor {
 			ID:           firstString(cleanStringPtr(row.DeviceID), cleanStringPtr(row.ProcessorId)),
 			Manufacturer: cleanStringPtr(row.Manufacturer),
 			Model:        cleanStringPtr(row.Name),
+			SerialNumber: cleanStringPtr(row.SerialNumber),
 			Architecture: normalizeProcessorArchitecture(row.Architecture),
 			Socket:       cleanStringPtr(row.SocketDesignation),
 		}

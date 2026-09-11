@@ -56,6 +56,7 @@ type Processor struct {
 	ID                    string `json:"id,omitempty"`
 	Manufacturer          string `json:"manufacturer,omitempty"`
 	Model                 string `json:"model,omitempty"`
+	SerialNumber          string `json:"serial_number,omitempty"`
 	Architecture          string `json:"architecture,omitempty"`
 	Socket                string `json:"socket,omitempty"`
 	PhysicalCoreCount     uint32 `json:"physical_core_count,omitempty"`

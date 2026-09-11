@@ -15,7 +15,7 @@ Implementation will use local WMI-over-COM through the MIT-licensed [`yusufpapur
 - Define:
   - `Inventory`: optional `System`, `Memory`; slices of `Processor`, `Disk`, `NetworkAdapter`, and `GPU`.
   - `System`: manufacturer, model, family, version, serial number, UUID, SKU, normalized system type, and optional `Chassis`, `Baseboard`, and `Firmware`.
-  - `Processor`: ID, manufacturer, model, architecture, socket, physical-core count, logical-processor count, and maximum clock MHz.
+  - `Processor`: ID, manufacturer, model, serial number, architecture, socket, physical-core count, logical-processor count, and maximum clock MHz.
   - `Memory`: installed physical bytes and `MemoryModule` entries containing bank/location, vendor, part/serial numbers, capacity, configured/rated MT/s, memory type, and form factor.
   - `Disk`: ID/index, PnP ID, vendor/model/serial, capacity, logical/physical sector sizes, normalized media/bus/partition-table types, and nested partitions.
   - `Partition`: ID/index, byte size, starting byte offset, and nested volumes.

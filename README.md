@@ -23,15 +23,33 @@ func main() {
 
 `Discover` has no configuration and returns no error. Queries are local, sequential, and independent. Missing WMI classes, unavailable properties, permissions failures, and unsupported enrichment are represented by omitted fields rather than errors.
 
-An abbreviated result looks like this:
+The following example shows every possible JSON field. Actual results omit
+zero-valued and unavailable data:
 
 ```json
 {
   "system": {
     "manufacturer": "Example Corp",
     "model": "RoadRunner 15",
+    "family": "Mobile",
+    "version": "Rev 2",
+    "serial_number": "SYS-123",
     "uuid": "abcdef12-3456-7890-abcd-ef1234567890",
+    "sku": "SKU-7",
     "system_type": "x86_64",
+    "chassis": {
+      "manufacturer": "Example Corp",
+      "model": "Shell",
+      "serial_number": "CASE-1",
+      "asset_tag": "ASSET-9",
+      "type": "laptop"
+    },
+    "baseboard": {
+      "manufacturer": "Boards Ltd",
+      "product": "Board X",
+      "version": "1.2",
+      "serial_number": "BOARD-1"
+    },
     "firmware": {
       "vendor": "Firmware Inc",
       "version": "2.4.6",
@@ -42,17 +60,50 @@ An abbreviated result looks like this:
     "installed_physical_bytes": 34359738368,
     "modules": [
       {
+        "bank": "BANK 0",
         "location": "DIMM_A",
+        "vendor": "Memory Co",
+        "part_number": "PART-A",
+        "serial_number": "MEM-A",
         "capacity_bytes": 17179869184,
         "configured_speed_mts": 3200,
-        "memory_type": "ddr4"
+        "rated_speed_mts": 3200,
+        "memory_type": "ddr4",
+        "form_factor": "dimm"
+      },
+      {
+        "bank": "BANK 1",
+        "location": "DIMM_B",
+        "vendor": "Memory Co",
+        "part_number": "PART-B",
+        "serial_number": "MEM-B",
+        "capacity_bytes": 17179869184,
+        "configured_speed_mts": 5200,
+        "rated_speed_mts": 5600,
+        "memory_type": "ddr5",
+        "form_factor": "sodimm"
       }
     ]
   },
   "processors": [
     {
       "id": "CPU0",
+      "manufacturer": "Chip Co",
+      "model": "FastChip",
+      "serial_number": "PROCESSOR-A",
       "architecture": "x86_64",
+      "socket": "Socket A",
+      "physical_core_count": 8,
+      "logical_processor_count": 16,
+      "max_clock_mhz": 4200
+    },
+    {
+      "id": "CPU1",
+      "manufacturer": "Chip Co",
+      "model": "FastChip",
+      "serial_number": "PROCESSOR-B",
+      "architecture": "x86_64",
+      "socket": "Socket B",
       "physical_core_count": 8,
       "logical_processor_count": 16,
       "max_clock_mhz": 4200
@@ -62,12 +113,115 @@ An abbreviated result looks like this:
     {
       "id": "\\\\.\\PHYSICALDRIVE0",
       "index": 0,
+      "pnp_id": "PCI\\DISK0",
+      "vendor": "Disk Co",
+      "model": "Speedy",
+      "serial_number": "DISK-A",
       "capacity_bytes": 1000000,
       "logical_sector_size_bytes": 512,
       "physical_sector_size_bytes": 4096,
       "media_type": "ssd",
       "bus_type": "nvme",
-      "partition_table_type": "gpt"
+      "partition_table_type": "gpt",
+      "partitions": [
+        {
+          "id": "Disk #0, Partition #0",
+          "index": 0,
+          "size_bytes": 400000,
+          "starting_offset_bytes": 1024,
+          "volumes": [
+            {
+              "id": "C:",
+              "label": "System",
+              "filesystem": "ntfs",
+              "capacity_bytes": 400000,
+              "mount_points": ["C:\\"]
+            }
+          ]
+        },
+        {
+          "id": "Disk #0, Partition #1",
+          "index": 1,
+          "size_bytes": 600000,
+          "starting_offset_bytes": 400000,
+          "volumes": [
+            {
+              "id": "D:",
+              "label": "Data",
+              "filesystem": "ntfs",
+              "capacity_bytes": 600000,
+              "mount_points": ["D:\\"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "\\\\.\\PHYSICALDRIVE1",
+      "index": 1,
+      "pnp_id": "USBSTOR\\DISK1",
+      "vendor": "Disk Co",
+      "model": "Archive",
+      "serial_number": "DISK-B",
+      "capacity_bytes": 2000000,
+      "logical_sector_size_bytes": 512,
+      "physical_sector_size_bytes": 4096,
+      "media_type": "hdd",
+      "bus_type": "usb",
+      "partition_table_type": "mbr",
+      "partitions": [
+        {
+          "id": "Disk #1, Partition #0",
+          "index": 0,
+          "size_bytes": 2000000,
+          "starting_offset_bytes": 1024,
+          "volumes": [
+            {
+              "id": "E:",
+              "label": "Archive",
+              "filesystem": "exfat",
+              "capacity_bytes": 2000000,
+              "mount_points": ["E:\\"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "network_adapters": [
+    {
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "name": "Ethernet",
+      "model": "Ether 1",
+      "vendor": "Net Co",
+      "physical_medium": "ethernet",
+      "mac_address": "00:11:22:33:44:55",
+      "pnp_id": "PCI\\NIC-A"
+    },
+    {
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "name": "Wi-Fi",
+      "model": "Wireless 2",
+      "vendor": "Net Co",
+      "physical_medium": "wireless_lan",
+      "mac_address": "00:11:22:AA:BB:CC",
+      "pnp_id": "PCI\\NIC-B"
+    }
+  ],
+  "gpus": [
+    {
+      "id": "PCI\\GPU-A",
+      "pnp_id": "PCI\\GPU-A",
+      "name": "GPU A",
+      "manufacturer": "Graphics Co",
+      "video_processor": "Core A"
+    },
+    {
+      "id": "PCI\\GPU-B",
+      "pnp_id": "PCI\\GPU-B",
+      "name": "GPU B",
+      "manufacturer": "Graphics Co",
+      "video_processor": "Core B"
     }
   ]
 }
