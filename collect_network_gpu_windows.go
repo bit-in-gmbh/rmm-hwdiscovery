@@ -3,9 +3,7 @@
 package hwdiscovery
 
 import (
-	"net"
 	"sort"
-	"strings"
 )
 
 type win32NetworkAdapter struct {
@@ -79,25 +77,6 @@ func collectGPUs(q queryer) []GPU {
 	}
 	sort.Slice(gpus, func(i, j int) bool { return gpus[i].ID < gpus[j].ID })
 	return gpus
-}
-
-func normalizeMAC(value string) string {
-	if value == "" {
-		return ""
-	}
-	address, err := net.ParseMAC(value)
-	if err != nil {
-		return ""
-	}
-	allZero, allF := true, true
-	for _, octet := range address {
-		allZero = allZero && octet == 0
-		allF = allF && octet == 0xff
-	}
-	if allZero || allF {
-		return ""
-	}
-	return strings.ToUpper(address.String())
 }
 
 func normalizePhysicalMedium(adapterType *uint16) string {

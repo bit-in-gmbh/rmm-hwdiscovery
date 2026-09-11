@@ -1,6 +1,6 @@
 # bigrmm-hwdiscovery
 
-`bigrmm-hwdiscovery` is a small, best-effort Go library for inventorying static hardware identity and configuration. Version 1 supports local Windows WMI over COM and never starts external programs.
+`bigrmm-hwdiscovery` is a small, best-effort Go library for inventorying static hardware identity and configuration. It supports local Windows discovery through WMI and Linux discovery through kernel-exposed files and read-only metadata caches. It never starts external programs.
 
 ## Usage
 
@@ -21,7 +21,7 @@ func main() {
 }
 ```
 
-`Discover` has no configuration and returns no error. Queries are local, sequential, and independent. Missing WMI classes, unavailable properties, permissions failures, and unsupported enrichment are represented by omitted fields rather than errors.
+`Discover` has no configuration and returns no error. Reads and queries are local, sequential, and independent. Missing kernel files or WMI classes, unavailable properties, permission failures, and unsupported enrichment are represented by omitted fields rather than errors.
 
 The following example shows every possible JSON field. Actual results omit
 zero-valued and unavailable data:
@@ -236,18 +236,29 @@ Byte fields are exact byte counts. Memory speeds are MT/s, maximum processor clo
 | Windows 10/11 | amd64, arm64 | Local WMI hardware discovery |
 | Windows Server 2016+ | amd64, arm64 | Local WMI hardware discovery |
 | Windows | 386 and other architectures | Compiles; returns an empty inventory |
-| Linux | all Go-supported architectures | Compiles; returns an empty inventory |
+| Linux | amd64, arm64 | Local procfs, sysfs, DMI/SMBIOS, device-tree, mount, and block-device metadata discovery |
+| Linux | Other architectures | Compiles; returns an empty inventory |
 | macOS | all Go-supported architectures | Compiles; returns an empty inventory |
+
+## Windows discovery
 
 No elevation is attempted. Hardware that the current process cannot inspect is omitted. Optional `MSFT_Disk` and `MSFT_PhysicalDisk` data enriches physical disks when the Storage namespace is available; base disks and partitions remain present when it is not.
 
+## Linux discovery
+
+Linux collectors read `/proc` and `/sys`, including DMI/SMBIOS and device-tree data where the kernel exposes them. They may enrich names, filesystem identity, and partition-table information from the existing read-only udev database under `/run/udev/data` and an installed `pci.ids` database. These caches are optional: the library never contacts udev, opens raw block devices, or invokes `dmidecode`, `lsblk`, `blkid`, `lspci`, or another command.
+
+Physical disks, partitions, and both mounted and recognized unmounted filesystems are inventoried. Device-mapper, LVM, encryption, and software-RAID relationships are followed through sysfs so a terminal filesystem is associated with its backing physical partitions; intermediate wrappers are not reported as disks or volumes. Filesystems placed directly on a whole disk cannot be represented by the partition-nested API and are omitted.
+
+Most Linux identity is readable without elevated privileges. Firmware-configured serial numbers and raw SMBIOS processor or DIMM records are commonly root-only; inaccessible values are omitted while the rest of the inventory is retained. Containers see only the procfs/sysfs and mount namespace made available by their runtime.
+
 ## Inventory, not monitoring
 
-This module collects hardware identity and configuration. It deliberately does not collect CPU load or current clock, available memory, disk free/used capacity or SMART health, network addresses/link state/current speed, GPU utilization or temperature, power-on hours, or other transient metrics. Runtime code does not invoke PowerShell, `wmic`, shells, or platform utilities.
+This module collects hardware identity and configuration. It deliberately does not collect CPU load or current clock, available memory, disk free/used capacity or SMART health, IP addresses/link state/current speed, GPU utilization or temperature, power-on hours, or other transient metrics. Runtime code does not invoke PowerShell, `wmic`, `dmidecode`, `lsblk`, `blkid`, `lspci`, shells, or other platform utilities.
 
 ## Security and privacy
 
-Inventory may contain serial numbers, UUIDs, MAC addresses, PnP identifiers, asset tags, and volume identifiers. These values can identify or correlate a device. Treat serialized inventory as sensitive operational data: minimize retention, restrict access, encrypt it in transit and at rest, and obtain any consent required by your policies or applicable law.
+Inventory may contain serial numbers, UUIDs, MAC addresses, PnP identifiers, asset tags, device paths, and volume identifiers. These values can identify or correlate a device. Treat serialized inventory as sensitive operational data: minimize retention, restrict access, encrypt it in transit and at rest, and obtain any consent required by your policies or applicable law.
 
 ## License and third-party notices
 

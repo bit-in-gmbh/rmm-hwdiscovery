@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+- Added complete best-effort Linux hardware discovery on amd64 and arm64 using procfs, sysfs, DMI/SMBIOS, device-tree, mount information, and optional read-only udev/PCI metadata.
+- Added Linux system, processor, memory-module, physical-storage, layered-volume, physical-network-adapter, and GPU fixture coverage.
 - Added best-effort processor serial-number discovery on supported Windows systems and expanded serial-number contract coverage for memory modules and physical disks.
 
 ## 1.0.0 - 2026-09-11
