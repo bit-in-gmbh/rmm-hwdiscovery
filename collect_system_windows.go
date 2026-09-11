@@ -26,7 +26,7 @@ type win32SystemEnclosure struct {
 	Model          *string
 	SerialNumber   *string
 	SMBIOSAssetTag *string
-	ChassisTypes   []uint16
+	ChassisTypes   []int32
 }
 
 type win32BaseBoard struct {

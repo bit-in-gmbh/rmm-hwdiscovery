@@ -2,7 +2,11 @@
 
 package hwdiscovery
 
-import "github.com/yusufpapurcu/wmi"
+import (
+	"errors"
+
+	"github.com/yusufpapurcu/wmi"
+)
 
 const cimv2Namespace = `root\cimv2`
 
@@ -43,6 +47,11 @@ func discover(q queryer) Inventory {
 	}
 }
 
-func queryClass(q queryer, namespace, class string, dst any) error {
+func queryClass(q queryer, namespace, class string, dst any) (err error) {
+	defer func() {
+		if recover() != nil {
+			err = errors.New("WMI query panicked")
+		}
+	}()
 	return q.Query(namespace, wmi.CreateQuery(dst, "", class), dst)
 }

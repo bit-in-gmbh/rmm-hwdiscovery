@@ -29,7 +29,11 @@ func cleanString(value string) string {
 	if value == "" {
 		return ""
 	}
-	if _, placeholder := firmwarePlaceholders[strings.ToLower(value)]; placeholder {
+	normalized := strings.ToLower(strings.Join(strings.Fields(value), " "))
+	if _, placeholder := firmwarePlaceholders[normalized]; placeholder {
+		return ""
+	}
+	if strings.Contains(normalized, "to be filled by o.e.m") || strings.Contains(normalized, "to be filled by oem") {
 		return ""
 	}
 	return value
@@ -89,7 +93,7 @@ func normalizeSystemType(value string) string {
 	case strings.Contains(value, "x86") || strings.Contains(value, "i386") || strings.Contains(value, "i686"):
 		return "x86"
 	default:
-		return value
+		return ""
 	}
 }
 
@@ -119,10 +123,12 @@ func normalizeProcessorArchitecture(value *uint16) string {
 	}
 }
 
-func normalizeChassisType(values []uint16) string {
+func normalizeChassisType(values []int32) string {
 	for _, value := range values {
-		if normalized := chassisType(value); normalized != "" {
-			return normalized
+		if value >= 0 {
+			if normalized := chassisType(uint16(value)); normalized != "" {
+				return normalized
+			}
 		}
 	}
 	return ""
@@ -143,20 +149,29 @@ func chassisType(value uint16) string {
 }
 
 func normalizeMemoryType(smbios *uint32, legacy *uint16) string {
-	var value uint32
 	if smbios != nil {
-		value = *smbios
-	} else if legacy != nil {
-		value = uint32(*legacy)
+		types := map[uint32]string{
+			3: "dram", 4: "edram", 5: "vram", 6: "sram", 7: "ram", 8: "rom",
+			9: "flash", 10: "eeprom", 11: "feprom", 12: "eprom", 13: "cdram",
+			14: "3dram", 15: "sdram", 16: "sgram", 17: "rdram", 18: "ddr",
+			19: "ddr2", 20: "ddr2_fb_dimm", 24: "ddr3", 26: "ddr4", 27: "lpddr",
+			28: "lpddr2", 29: "lpddr3", 30: "lpddr4", 34: "ddr5", 35: "lpddr5",
+		}
+		if normalized := types[*smbios]; normalized != "" {
+			return normalized
+		}
 	}
-	types := map[uint32]string{
-		3: "dram", 4: "edram", 5: "vram", 6: "sram", 7: "ram", 8: "rom",
-		9: "flash", 10: "eeprom", 11: "feprom", 12: "eprom", 13: "cdram",
-		14: "3dram", 15: "sdram", 16: "sgram", 17: "rdram", 18: "ddr",
-		19: "ddr2", 20: "ddr2_fb_dimm", 24: "ddr3", 26: "ddr4", 27: "lpddr",
-		28: "lpddr2", 29: "lpddr3", 30: "lpddr4", 34: "ddr5", 35: "lpddr5",
+	if legacy == nil {
+		return ""
 	}
-	return types[value]
+	legacyTypes := map[uint16]string{
+		1: "other", 2: "dram", 3: "synchronous_dram", 4: "cache_dram", 5: "edo",
+		6: "edram", 7: "vram", 8: "sram", 9: "ram", 10: "rom", 11: "flash",
+		12: "eeprom", 13: "feprom", 14: "eprom", 15: "cdram", 16: "3dram",
+		17: "sdram", 18: "sgram", 19: "rdram", 20: "ddr", 21: "ddr2",
+		22: "ddr2_fb_dimm", 24: "ddr3", 26: "ddr4",
+	}
+	return legacyTypes[*legacy]
 }
 
 func normalizeMemoryFormFactor(value *uint16) string {

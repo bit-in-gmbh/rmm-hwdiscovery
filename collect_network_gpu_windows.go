@@ -9,16 +9,15 @@ import (
 )
 
 type win32NetworkAdapter struct {
-	GUID               *string
-	DeviceID           *string
-	PNPDeviceID        *string
-	Name               *string
-	ProductName        *string
-	Manufacturer       *string
-	MACAddress         *string
-	PhysicalAdapter    *bool
-	AdapterTypeID      *uint16
-	NdisPhysicalMedium *uint16
+	GUID            *string
+	DeviceID        *string
+	PNPDeviceID     *string
+	Name            *string
+	ProductName     *string
+	Manufacturer    *string
+	MACAddress      *string
+	PhysicalAdapter *bool
+	AdapterTypeID   *uint16
 }
 
 type win32VideoController struct {
@@ -45,7 +44,7 @@ func collectNetworkAdapters(q queryer) []NetworkAdapter {
 			Name:           cleanStringPtr(row.Name),
 			Model:          cleanStringPtr(row.ProductName),
 			Vendor:         cleanStringPtr(row.Manufacturer),
-			PhysicalMedium: normalizePhysicalMedium(row.NdisPhysicalMedium, row.AdapterTypeID),
+			PhysicalMedium: normalizePhysicalMedium(row.AdapterTypeID),
 			MACAddress:     normalizeMAC(cleanStringPtr(row.MACAddress)),
 			PNPID:          cleanStringPtr(row.PNPDeviceID),
 		}
@@ -101,19 +100,7 @@ func normalizeMAC(value string) string {
 	return strings.ToUpper(address.String())
 }
 
-func normalizePhysicalMedium(ndis, adapterType *uint16) string {
-	if ndis != nil {
-		media := map[uint16]string{
-			1: "wireless_lan", 2: "cable_modem", 3: "phone_line", 4: "power_line",
-			5: "dsl", 6: "fibre_channel", 7: "ieee_1394", 8: "wireless_wan",
-			9: "wireless_lan", 10: "bluetooth", 11: "infiniband", 12: "wimax",
-			13: "uwb", 14: "ethernet", 15: "token_ring", 16: "infrared",
-			17: "wired_wan", 18: "wired_co_wan", 19: "other",
-		}
-		if value := media[*ndis]; value != "" {
-			return value
-		}
-	}
+func normalizePhysicalMedium(adapterType *uint16) string {
 	if adapterType == nil {
 		return ""
 	}

@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Verify formatting
+        shell: pwsh
+        run: |
+          $unformatted = gofmt -l .
+          if ($unformatted) {
+            Write-Error "Unformatted files: $unformatted"
+            exit 1
+          }
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: go test ./...
+
+  windows-arm64-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Cross-build tests
+        shell: pwsh
+        run: |
+          $env:GOOS = "windows"
+          $env:GOARCH = "arm64"
+          go test -c -o hwdiscovery-arm64.test.exe .
