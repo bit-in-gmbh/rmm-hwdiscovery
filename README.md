@@ -1,6 +1,6 @@
 # bigrmm-hwdiscovery
 
-`bigrmm-hwdiscovery` is a small, best-effort Go library for inventorying static hardware identity and configuration. It supports local Windows discovery through WMI and Linux discovery through kernel-exposed files and read-only metadata caches. It never starts external programs.
+`bigrmm-hwdiscovery` is a small, best-effort Go library for inventorying static hardware identity and configuration. It supports local Windows discovery through WMI, Linux discovery through kernel-exposed files and read-only metadata caches, and macOS discovery through Darwin sysctls and native Apple frameworks. It never starts external programs.
 
 ## Usage
 
@@ -238,7 +238,7 @@ Byte fields are exact byte counts. Memory speeds are MT/s, maximum processor clo
 | Windows | 386 and other architectures | Compiles; returns an empty inventory |
 | Linux | amd64, arm64 | Local procfs, sysfs, DMI/SMBIOS, device-tree, mount, and block-device metadata discovery |
 | Linux | Other architectures | Compiles; returns an empty inventory |
-| macOS | all Go-supported architectures | Compiles; returns an empty inventory |
+| macOS | amd64, arm64 | Local Sysctl, IOKit, CoreFoundation, Disk Arbitration, and System Configuration discovery |
 
 ## Windows discovery
 
@@ -252,9 +252,15 @@ Physical disks, partitions, and both mounted and recognized unmounted filesystem
 
 Most Linux identity is readable without elevated privileges. Firmware-configured serial numbers and raw SMBIOS processor or DIMM records are commonly root-only; inaccessible values are omitted while the rest of the inventory is retained. Containers see only the procfs/sysfs and mount namespace made available by their runtime.
 
+## macOS discovery
+
+macOS collectors query Darwin sysctls and the in-process CoreFoundation, IOKit, Disk Arbitration, and System Configuration APIs. They inventory platform identity, processor topology, installed memory, optional Intel SMBIOS memory devices, physical storage and partitions, recognized volumes, physical network interfaces, and graphics controllers without invoking `system_profiler`, `ioreg`, `diskutil`, `sysctl`, or another program.
+
+The native framework enrichment is available when cgo is enabled, which is the default for native macOS builds. A macOS build with cgo disabled still compiles and returns the system, processor, and installed-memory information available through sysctl. APFS volumes are associated with a physical partition when IOKit's registry exposes that ancestry; otherwise the physical disk and partition remain present while the volume is omitted.
+
 ## Inventory, not monitoring
 
-This module collects hardware identity and configuration. It deliberately does not collect CPU load or current clock, available memory, disk free/used capacity or SMART health, IP addresses/link state/current speed, GPU utilization or temperature, power-on hours, or other transient metrics. Runtime code does not invoke PowerShell, `wmic`, `dmidecode`, `lsblk`, `blkid`, `lspci`, shells, or other platform utilities.
+This module collects hardware identity and configuration. It deliberately does not collect CPU load or current clock, available memory, disk free/used capacity or SMART health, IP addresses/link state/current speed, GPU utilization or temperature, power-on hours, or other transient metrics. Runtime code does not invoke PowerShell, `wmic`, `system_profiler`, `ioreg`, `diskutil`, `sysctl`, `dmidecode`, `lsblk`, `blkid`, `lspci`, shells, or other platform utilities.
 
 ## Security and privacy
 
