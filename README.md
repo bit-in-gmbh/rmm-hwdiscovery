@@ -1,6 +1,8 @@
 # bigrmm-hwdiscovery
 
-`bigrmm-hwdiscovery` is a small, best-effort Go library for inventorying static hardware identity and configuration. It supports local Windows discovery through WMI, Linux discovery through kernel-exposed files and read-only metadata caches, and macOS discovery through Darwin sysctls and native Apple frameworks. It never starts external programs.
+`bigrmm-hwdiscovery` is a small, best-effort Go library developed for our own [remote monitoring and management (RMM) solution](https://www.bit-in.de/rmm). It transparently collects the static hardware identity and configuration data available on a system.
+
+Discovery is performed locally through WMI on Windows, kernel-exposed files and read-only metadata caches on Linux, and Darwin sysctls and native Apple frameworks on macOS. Unavailable data is gracefully omitted, and external programs are never started.
 
 ## Usage
 
