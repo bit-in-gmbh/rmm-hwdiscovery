@@ -25,8 +25,9 @@ func (q *localWMIQueryer) Query(namespace, query string, dst any) error {
 	return q.client.Query(query, dst, nil, namespace)
 }
 
-// Discover inventories static hardware identity and configuration available
-// through local WMI. Failed or inaccessible queries are silently omitted.
+// Discover returns a best-effort inventory of static hardware identity and
+// configuration available through local WMI. Failed or inaccessible queries
+// omit only their unavailable data.
 func Discover() Inventory {
 	return discover(&localWMIQueryer{client: &wmi.Client{
 		NonePtrZero:        true,

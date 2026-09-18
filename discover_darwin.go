@@ -28,9 +28,9 @@ type darwinSysctlValues struct {
 	uints   map[string]uint64
 }
 
-// Discover inventories static hardware identity and configuration exposed by
-// Darwin sysctls and native Apple frameworks. Inaccessible or unavailable
-// properties are silently omitted.
+// Discover returns a best-effort inventory of static hardware identity and
+// configuration exposed by Darwin sysctls and native Apple frameworks.
+// Inaccessible or unavailable properties are omitted.
 func Discover() Inventory {
 	return discoverDarwin(readDarwinSysctls(), readDarwinNativeInventory())
 }

@@ -2,9 +2,9 @@
 
 package hwdiscovery
 
-// Discover inventories static hardware identity and configuration exposed by
-// Linux kernel filesystems and optional local metadata caches. Inaccessible or
-// malformed data is silently omitted.
+// Discover returns a best-effort inventory of static hardware identity and
+// configuration exposed by Linux kernel filesystems and optional local metadata
+// caches. Inaccessible or malformed data is omitted.
 func Discover() Inventory {
 	return discoverLinux(defaultLinuxSource())
 }
